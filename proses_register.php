@@ -4,15 +4,22 @@ require 'config.php';
 $status = '';
 
 if (isset($_POST['submit'])) {
-    $nama_pengguna = $_POST['nama_pengguna'];
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql = "INSERT INTO $table_logistics VALUES('$nama_pengguna', '$username', '$password')";
+    $sql = "SELECT * $table_users WHERE username='$username'";
     $query = mysqli_query($connect, $sql);
 
     // * PAKE $_GET[]
-    if ($query) {
+    if ($query && $query->num_rows > 0) {
+        while ($data = mysqli_fetch_array($query)) {
+            if (password_verify($password, $data['password'])) {
+                $status = 'berhasil_login';
+                // header();
+            } else {
+                $status = 'Invalid username/password.';
+            }
+        }
         // * HEADER BELUM CUMA GET STATUS DARI BACKEND SUCCESS
         // header();
         $status = 'register_success';
